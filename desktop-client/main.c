@@ -54,7 +54,7 @@ void set_random_color(GtkButton *button, GtkColorSelection *color_selection, gpo
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
-    setup_connection_to_mcu("", 80);
+    setup_connection_to_mcu("192.168.0.12", 12345);
     
     GtkBuilder *builder = gtk_builder_new();
     GError *error = NULL;
