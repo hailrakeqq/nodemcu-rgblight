@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiType.h>
+#include <WiFiUdp.h>
 
 #define RED D1
 #define GREEN D2
@@ -10,31 +11,14 @@
 
 const char *ssid = "busya";
 const char *password = "0677170801";
+const int udpPort = 12345;
 
-ESP8266WebServer server(80);
+WiFiUDP udp;
 
-void handleRoot() {
-  String html = "<html><body>";
-  html += "<h1>RGB LED Control</h1>";
-  html += "<form action='/setColor' method='GET'>";
-  html += "Red: <input type='text' name='red' value='0'><br>";
-  html += "Green: <input type='text' name='green' value='0'><br>";
-  html += "Blue: <input type='text' name='blue' value='0'><br>";
-  html += "<input type='submit' value='Set Color'>";
-  html += "</form></body></html>";
-  server.send(200, "text/html", html);
-}
-
-void handleSetColor() {
-  int red = server.arg("red").toInt();
-  int green = server.arg("green").toInt();
-  int blue = server.arg("blue").toInt();
-
+void setColor(uint8_t red, uint8_t green, uint8_t blue) {
   analogWrite(RED, red);
   analogWrite(GREEN, green);
   analogWrite(BLUE, blue);
-
-  server.send(200, "text/html", "Color Set");
 }
 
 void setup() {
@@ -55,13 +39,28 @@ void setup() {
   Serial.println("");
   Serial.println("WiFi connected");
 
-  server.on("/", HTTP_GET, handleRoot);
-  server.on("/setColor", HTTP_GET, handleSetColor);
-
-  server.begin();
-  Serial.println("HTTP server started");
-  Serial.print("IP addr: ");
-  Serial.println(WiFi.localIP().toString());
+  udp.begin(udpPort);
+  Serial.printf("UDP server started on port %d\n", udpPort);
 }
 
-void loop() { server.handleClient(); }
+void loop() {
+  int packetSize = udp.parsePacket();
+  if (packetSize) {
+    Serial.printf("Received %d bytes from %s, port %d\n", packetSize,
+                  udp.remoteIP().toString().c_str(), udp.remotePort());
+
+    char packetBuffer[255];
+    int len = udp.read(packetBuffer, sizeof(packetBuffer));
+
+    if (len > 0) {
+      packetBuffer[len] = 0;
+      Serial.printf("Received message: %s\n", packetBuffer);
+      // TODO: add parser to message
+      //  call color changer method
+    }
+
+    udp.beginPacket(udp.remoteIP(), udp.remotePort());
+    udp.printf("Hello from NodeMCU!");
+    udp.endPacket();
+  }
+}

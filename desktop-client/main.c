@@ -1,15 +1,45 @@
 #include <gtk-3.0/gtk/gtk.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int clientSocket;  
+struct sockaddr_in serverAddress;
+
+void setup_connection_to_mcu(char *ip, int port){
+    clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_port = htons(port);
+    serverAddress.sin_addr.s_addr = inet_addr(ip);
+
+    if(connect(clientSocket,(struct sockaddr_in *) &serverAddress, sizeof(serverAddress)) < 0){
+        perror("Error connecting to the microcontroller");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void send_color_to_mcu(uint8_t red, uint8_t green, uint8_t blue){
+    char buffer[50];
+    sprintf(buffer, "%d,%d,%d", red, green, blue);
+
+    send(clientSocket, buffer, strlen(buffer), 0);
+}
 
 void on_color_changed(GtkColorSelection *color_selection, gpointer user_data) {
     GdkRGBA color;
    
     gtk_color_selection_get_current_rgba(color_selection, &color);
 
-    int red = CLAMP((int)(color.red * 255.0 + 0.5), 0, 255);
-    int green = CLAMP((int)(color.green * 255.0 + 0.5), 0, 255);
-    int blue = CLAMP((int)(color.blue * 255.0 + 0.5), 0, 255);
+    int red = CLAMP((uint8_t)(color.red * 255.0 + 0.5), 0, 255);
+    int green = CLAMP((uint8_t)(color.green * 255.0 + 0.5), 0, 255);
+    int blue = CLAMP((uint8_t)(color.blue * 255.0 + 0.5), 0, 255);
 
     g_print("Selected Color: %d, %d, %d\n", red, green, blue);
+
+    send_color_to_mcu(red, green, blue);
 }
 
 void set_random_color(GtkButton *button, GtkColorSelection *color_selection, gpointer user_data){
@@ -24,6 +54,8 @@ void set_random_color(GtkButton *button, GtkColorSelection *color_selection, gpo
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
+    setup_connection_to_mcu("", 80);
+    
     GtkBuilder *builder = gtk_builder_new();
     GError *error = NULL;
     gtk_builder_add_from_file(builder, "../ui/main.glade", NULL);
