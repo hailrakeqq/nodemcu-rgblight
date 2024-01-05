@@ -10,6 +10,9 @@
 #define BLUE D3
 #define RESET_LED setColor(0, 0, 0)
 
+const enum modeList { STATIC, CHASE, RAINBOW };
+
+static modeList mode = STATIC;
 static uint8_t red = 0;
 static uint8_t green = 0;
 static uint8_t blue = 0;
@@ -21,19 +24,36 @@ const int udpPort = 12345;
 WiFiUDP udp;
 
 void parseString(String input) {
-  int comma1 = input.indexOf(',');
-  int comma2 = input.indexOf(',', comma1 + 1);
+  if (input.startsWith("mode:")) {
+    String newMode = input.substring(6);
+    newMode.toLowerCase();
+    setNewMode(newMode);
+  } else if (input.startsWith("color:")) {
+    int comma1 = input.indexOf(',');
+    int comma2 = input.indexOf(',', comma1 + 1);
 
-  if (comma1 != -1 && comma2 != -1) {
-    String strValue1 = input.substring(0, comma1);
-    String strValue2 = input.substring(comma1 + 1, comma2);
-    String strValue3 = input.substring(comma2 + 1);
+    if (comma1 != -1 && comma2 != -1) {
+      red = input.substring(7, comma1).toInt();
+      green = input.substring(comma1 + 2, comma2).toInt();
+      blue = input.substring(comma2 + 2).toInt();
 
-    red = strValue1.toInt();
-    green = strValue2.toInt();
-    blue = strValue3.toInt();
+      setColor(red, green, blue);
+    } else {
+      Serial.println("Invalid input string");
+    }
+  }
+}
+
+// TODO: add mode play function
+void setNewMode(String newMode) {
+  if (newMode.equals("static")) {
+    mode = STATIC;
+  } else if (newMode.equals("chase")) {
+    mode = CHASE;
+  } else if (newMode.equals("rainbow")) {
+    mode = RAINBOW;
   } else {
-    Serial.println("Invalid input string");
+    mode = STATIC;
   }
 }
 
@@ -75,7 +95,6 @@ void loop() {
       // TODO: add word to packet: example: color: 255, 255, 255; mode: blink;
       // etc...
       parseString(packetBuffer);
-      setColor(red, green, blue);
     }
   }
 }

@@ -2,6 +2,40 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
+  <object class="GtkListStore" id="liststore1">
+    <columns>
+      <!-- column-name mode -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">Static</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Chase</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Rainbow</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="liststore2">
+    <columns>
+      <!-- column-name mode -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">Static</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Chase</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Rainbow</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="main_window">
     <property name="can-focus">False</property>
     <property name="resizable">False</property>
@@ -14,6 +48,7 @@
           <object class="GtkLabel" id="label">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="margin-bottom">6</property>
             <property name="label" translatable="yes">nodemcu-rgblight controller</property>
           </object>
           <packing>
@@ -26,6 +61,7 @@
           <object class="GtkColorSelection" id="color_picker">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="margin-bottom">10</property>
             <property name="orientation">vertical</property>
           </object>
           <packing>
@@ -41,11 +77,16 @@
             <property name="spacing">10</property>
             <property name="homogeneous">True</property>
             <child>
-              <object class="GtkButton" id="mode_btn">
-                <property name="label" translatable="yes">modebtnidk</property>
+              <object class="GtkComboBoxText" id="mode_combobox">
                 <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
+                <property name="can-focus">False</property>
+                <property name="active">0</property>
+                <property name="active-id">0</property>
+                <items>
+                  <item id="1" translatable="yes">Static</item>
+                  <item id="2" translatable="yes">Chase</item>
+                  <item id="3" translatable="yes">Rainbow</item>
+                </items>
               </object>
               <packing>
                 <property name="expand">False</property>
