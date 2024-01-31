@@ -1,3 +1,4 @@
+#include "../include/secret.h"
 #include <Arduino.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
@@ -17,8 +18,8 @@ static uint8_t red = 0;
 static uint8_t green = 0;
 static uint8_t blue = 0;
 
-const char *ssid = "busya";
-const char *password = "0677170801";
+const char *ssid = SSID;
+const char *password = SSID_PASSWD;
 const int udpPort = 12345;
 
 WiFiUDP udp;
