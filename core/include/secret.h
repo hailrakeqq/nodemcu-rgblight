@@ -1,2 +1,2 @@
-#define SSID "PUT YOUR SSID HERE"
-#define SSID_PASSWD "PUT SSID PASSWORD HERE"
+#define SSID "busya"
+#define SSID_PASSWD "0677170801"
